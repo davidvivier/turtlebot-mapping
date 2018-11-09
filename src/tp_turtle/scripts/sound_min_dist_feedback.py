@@ -9,9 +9,18 @@ ledPub = rospy.Publisher('/mobile_base/commands/led1', Led, queue_size=0)
 
 led_state = 0
 
+
+
 def callback(data):
 
-    min_dist = float(data)
+    min_dist = float(data.data)
+
+    period = 0.06 + min_dist*0.25/1.1
+    global rate
+    rate = rospy.Rate(2/(period))
+
+    rospy.loginfo(rospy.get_caller_id() + 'Dist = %f Period = %f Rate = %f', min_dist, period, 2/(period))
+
 
 
 def toggle_led():
@@ -21,14 +30,17 @@ def toggle_led():
 
 def listener():
     global led_state
-    
+
     rospy.init_node('sound_min_dist_feedback', anonymous=True)
 
     rospy.Subscriber('/min_dist', String, callback)
 
-    rate = rospy.Rate(1) # 10hz
+    global rate
+    rate = rospy.Rate(1)
+    
     while not rospy.is_shutdown():
         toggle_led()
+
         rate.sleep()
 
     # spin() simply keeps python from exiting until this node is stopped
