@@ -3,8 +3,9 @@
 import rospy
 from std_msgs.msg import String
 from kobuki_msgs.msg import Led 
+from kobuki_msgs.msg import Sound 
 
-#soundPub = rospy.Publisher('', String, queue_size=0)
+soundPub = rospy.Publisher('/mobile_base/commands/sound', Sound, queue_size=0)
 ledPub = rospy.Publisher('/mobile_base/commands/led1', Led, queue_size=0)
 
 led_state = 0
@@ -40,7 +41,7 @@ def listener():
     
     while not rospy.is_shutdown():
         toggle_led()
-
+        soundPub.publish(3)
         rate.sleep()
 
     # spin() simply keeps python from exiting until this node is stopped
