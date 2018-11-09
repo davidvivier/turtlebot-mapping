@@ -7,7 +7,14 @@ from sensor_msgs.msg import LaserScan
 pub = rospy.Publisher('min_dist', String, queue_size=0)
 
 def callback(data):
-    values = [ v for v in data.ranges if str(v) != 'nan' ]
+    values = []
+    
+    for val in data.ranges:
+        if ( str(val) == 'nan' ): 
+            values.append(11.)
+        else:
+            values.append(val)
+    
     if (len(values) > 0):
         min_dist = min(values)
         rospy.loginfo(rospy.get_caller_id() + 'Minimal distance %f ', min_dist)

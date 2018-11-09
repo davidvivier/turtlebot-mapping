@@ -13,11 +13,12 @@ def v_max(d):
 
 def cmd_vel_callback(data):
     global min_dist 
-    rospy.loginfo(rospy.get_caller_id() + 'min_dist : %f ', min_dist)
-    rospy.loginfo(rospy.get_caller_id() + 'x before : %f ', data.linear.x)
-    data.linear.x = min( v_max(min_dist), data.linear.x)
-    rospy.loginfo(rospy.get_caller_id() + 'x after : %f ', data.linear.x)
 
+    if (data.linear.x > 0. and min_dist >= 11.):
+        data.linear.x = 0.1
+    else:
+        data.linear.x = min( v_max(min_dist), data.linear.x)
+    
     pub.publish(data)
 
 def min_dist_callback(data):
