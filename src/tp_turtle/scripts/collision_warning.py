@@ -4,19 +4,10 @@ import rospy
 from std_msgs.msg import String
 from kobuki_msgs.msg import BumperEvent
 from kobuki_msgs.msg import Sound
+from std_msgs.msg import Bool
 
 soundPub = rospy.Publisher('/mobile_base/commands/sound', Sound, queue_size=0)
-
-def talker():
-    pub = rospy.Publisher('chatter', String, queue_size=0)
-    rospy.init_node('collision_warning', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
-        rate.sleep()
-
+emStopPub = rospy.Publisher('/em_stop', Bool, queue_size=0)
 
 def play_sound():
     soundPub.publish(1)
@@ -24,18 +15,22 @@ def play_sound():
 
 def callback(data):
     bumper = data
+    
+
     if bumper.state == 1:
         # log 
         rospy.loginfo(rospy.get_caller_id() + 'Front collision detected ')
         # sound
         play_sound()
-
+        emStopPub.publish(True)
+    else:
+        emStopPub.publish(False)
 
 
 
 def listener():
 
-    rospy.init_node('listener', anonymous=True)
+    rospy.init_node('collision_warning', anonymous=True)
 
     rospy.Subscriber('/mobile_base/events/bumper', BumperEvent, callback)
 
